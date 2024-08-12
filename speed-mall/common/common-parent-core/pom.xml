@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.knife.example</groupId>
+        <artifactId>common-parent-api</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../common-parent-api/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>common-parent-core</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+    <name>common-parent-core</name>
+    <description>Demo project for Spring Boot</description>
+
+    <properties>
+        <custom.project.name>speed-mall</custom.project.name>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>test</id>
+            <properties>
+                <profileActive>test</profileActive>
+                <custom.nacos.server-addr>127.0.0.1:8848</custom.nacos.server-addr>
+                <custom.nacos.username>nacos</custom.nacos.username>
+                <custom.nacos.password>nacos</custom.nacos.password>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+        <profile>
+            <id>pre</id>
+            <properties>
+                <profileActive>pre</profileActive>
+                <custom.nacos.server-addr>127.0.0.1:8849</custom.nacos.server-addr>
+                <custom.nacos.username>nacos</custom.nacos.username>
+                <custom.nacos.password>nacos</custom.nacos.password>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profileActive>prod</profileActive>
+                <custom.nacos.server-addr>127.0.0.1:8850</custom.nacos.server-addr>
+                <custom.nacos.username>nacos</custom.nacos.username>
+                <custom.nacos.password>nacos</custom.nacos.password>
+            </properties>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId> springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--SpringBoot2.4.x之后默认不加载bootstrap.yml文件，需要在pom里加上依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-loadbalancer</artifactId>
+        </dependency>
+
+        <!--支持feign缓存-->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>2.9.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <resources>
+            <!--先只取bootstrap.yml等，不取application*.yml文件-->
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>application*.yml</exclude>
+                </excludes>
+                <!-- 是否替换yml或者properties里@xx@表示的maven properties属性值 -->
+                <filtering>true</filtering>
+            </resource>
+
+            <!--添加application.yml等文件-->
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>application.yml</include>
+                    <include>application-${profileActive}.yml</include>
+                    <!--<include>**/application-${profileActive}.yml</include>-->
+                </includes>
+                <!-- 是否替换yml或者properties里@xx@表示的maven properties属性值 -->
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+</project>
